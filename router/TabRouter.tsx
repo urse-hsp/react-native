@@ -1,52 +1,116 @@
-import { Component } from 'react';
+import React from 'react';
+import { View, StyleSheet } from 'react-native';
+
+import { CommonActions } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { HomeScreen, ListScreen, DetailsScreen } from './index';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-const ListStack = createNativeStackNavigator();
+import { Text, BottomNavigation } from 'react-native-paper';
+// import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+// import Icon from 'react-native-vector-icons/Ionicons';
+
 const Tab = createBottomTabNavigator();
 
-function ListStackScreen() {
+export default function MyComponent() {
   return (
-    <ListStack.Navigator>
-      <ListStack.Screen
-        name="List"
-        component={ListScreen} />
-      <ListStack.Screen
-        name="Details"
-        component={DetailsScreen} />
-    </ListStack.Navigator>
+    <Tab.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}
+      tabBar={({ navigation, state, descriptors, insets }) => (
+        <BottomNavigation.Bar
+          navigationState={state}
+          safeAreaInsets={insets}
+          onTabPress={({ route, preventDefault }) => {
+            const event = navigation.emit({
+              type: 'tabPress',
+              target: route.key,
+              canPreventDefault: true,
+            });
+
+            if (event.defaultPrevented) {
+              preventDefault();
+            } else {
+              navigation.dispatch({
+                ...CommonActions.navigate(route.name, route.params),
+                target: state.key,
+              });
+            }
+          }}
+          renderIcon={({ route, focused, color }) => {
+            const { options } = descriptors[route.key];
+            if (options.tabBarIcon) {
+              return options.tabBarIcon({ focused, color, size: 24 });
+            }
+
+            return null;
+          }}
+          getLabelText={({ route }) => {
+            const { options } = descriptors[route.key];
+            const label =
+              options.tabBarLabel !== undefined
+                ? options.tabBarLabel
+                : options.title !== undefined
+                  ? options.title
+                  : route.title;
+
+            return label;
+          }}
+        />
+      )}
+    >
+      <Tab.Screen
+        name="Home"
+        component={HomeScreen}
+        options={{
+          tabBarLabel: 'Home',
+          // tabBarIcon: ({ color, size }) => {
+          //   return <Icon name="home" size={size} color={color} />;
+          // },
+        }}
+      />
+      <Tab.Screen
+        name="Settings"
+        component={SettingsScreen}
+        options={{
+          tabBarLabel: 'Settings',
+          // tabBarIcon: ({ color, size }) => {
+          //   return <Icon name="cog" size={size} color={color} />;
+          // },
+        }}
+      />
+      <Tab.Screen
+        name="MY"
+        component={SettingsScreen}
+        options={{
+          tabBarLabel: 'MY',
+          // tabBarIcon: ({ color, size }) => {
+          //   return <Icon name="cog" size={size} color={color} />;
+          // },
+        }}
+      />
+    </Tab.Navigator>
   );
 }
 
-class TabRouter extends Component {
-  render() {
-    return (
-      <Tab.Navigator
-        screenOptions={({ route }: any) => ({
-          tabBarActiveTintColor: 'tomato',
-          tabBarInactiveTintColor: 'gray',
-          tabBarShowLabel: false, // 只需要展示图标，而不要label，将tabBarShowLabel选项置为false即可。
-          // tabBarIcon: ({ focused, color, size }) => {
-          //   let iconName;
-          //   if (route.name === 'Home') {
-          //     iconName = focused ? 'home' : 'home-outline';
-          //   }
-          //   if (route.name === 'List') {
-          //     iconName = focused ? 'list-circle' : 'list-circle-outline';
-          //   }
-          //   return <Ionicons name={iconName} size={size} color={color} />;
-          // },
-        })}>
-        <Tab.Screen name="Home" component={HomeScreen} />
-        <Tab.Screen
-          name="ListStack"
-          component={ListStackScreen} options={{
-            // 将ListStack的headerShown置为false即可将它的导航栏隐藏：
-            headerShown: false,
-          }} />
-      </Tab.Navigator>
-    );
-  }
+function HomeScreen() {
+  return (
+    <View style={styles.container}>
+      <Text variant="headlineMedium">Home!</Text>
+    </View>
+  );
 }
 
-export default TabRouter;
+function SettingsScreen() {
+  return (
+    <View style={styles.container}>
+      <Text variant="headlineMedium">Settings!</Text>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});

@@ -4,12 +4,14 @@ import {
   Text,
   View, Button,
 } from 'react-native';
+import Appbar from '../pages/Appbar';
 
 const Stack = createNativeStackNavigator();
 
 export function HomeScreen({ navigation }: any) {
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+      <Appbar />
       <Text>Home Screen</Text>
       <Button
         onPress={() => navigation.navigate('List')}
